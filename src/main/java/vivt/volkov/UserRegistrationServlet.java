@@ -1,14 +1,16 @@
 package vivt.volkov;
 
 
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
 import vivt.volkov.models.User;
 import vivt.volkov.services.UserService;
 
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+
+import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -21,10 +23,9 @@ import java.util.stream.Collectors;
 
 @WebServlet("/user/registration")
 public class UserRegistrationServlet extends HttpServlet {
+    static final Logger log = Logger.getLogger("UserRegistrationServlet");
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse res) {
-        Logger log = Logger.getLogger(this.getClass().getName());
-
+    protected void doPost(HttpServletRequest req, HttpServletResponse res) throws IOException {
         try
         {
             String body = IOUtils.toString(req.getReader());
@@ -38,19 +39,19 @@ public class UserRegistrationServlet extends HttpServlet {
             String userName = params.get("UserName");
             String userLogin = params.get("UserLogin");
             String userSurname = params.get("UserSurname");
-            String userPatronymic = params.get("UserPatronymic");
+            String userPatronymic = params.getOrDefault("UserPatronymic", "");
 
-            if (userLogin.isEmpty()) {
+            if (userLogin == null || userLogin.isEmpty()) {
                 log.warning("client not send login");
                 res.sendError(400, "User login required");
                 return;
             }
-            if (userName.isEmpty()) {
+            if (userName == null || userName.isEmpty()) {
                 log.warning("client not send name");
                 res.sendError(400, "User name required");
                 return;
             }
-            if (userSurname.isEmpty()) {
+            if (userSurname == null || userSurname.isEmpty()) {
                 log.warning("client not send surname");
                 res.sendError(400, "User surname required");
                 return;
@@ -68,7 +69,7 @@ public class UserRegistrationServlet extends HttpServlet {
             }
 
             res.setStatus(200);
-            String reply = String.format("Login='%s', Password='%s", user.get().getLogin(), user.get().getPassword());
+            String reply = String.format("Login='%s', Password='%s'", user.get().getLogin(), user.get().getPassword());
 
             res.setContentType("test/plain; charset=utf-8;");
             res.getWriter().write(reply);
@@ -78,6 +79,7 @@ public class UserRegistrationServlet extends HttpServlet {
         catch (Exception exc)
         {
             log.log(Level.SEVERE, "error during handle", exc);
+            res.sendError(500, "Exception: " + exc.getMessage());
         }
     }
 }

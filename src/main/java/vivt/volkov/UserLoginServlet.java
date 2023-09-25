@@ -1,13 +1,14 @@
 package vivt.volkov;
 
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
 import vivt.volkov.models.User;
 import vivt.volkov.services.UserService;
 
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -17,12 +18,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+
 @WebServlet("/user/login")
 public class UserLoginServlet extends HttpServlet {
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse res) {
-        Logger log = Logger.getLogger(this.getClass().getName());
+    final static Logger log = Logger.getLogger("UserLoginServlet");
 
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse res) throws IOException {
         try {
             String body = IOUtils.toString(req.getReader());
             String decoded = URLDecoder.decode(body, StandardCharsets.UTF_8);
@@ -48,12 +50,13 @@ public class UserLoginServlet extends HttpServlet {
 
             UserService.instance().loginUser(user.get(), req.getRemoteHost());
             res.setContentType("text/plain");
-            res.getWriter().write(String.format("Здравствуйте %s %s",
+            res.getWriter().write(String.format("Здравствуйте, %s %s",
                     user.get().getName(),
                     user.get().getPatronymic()));
         }
         catch (Exception exc) {
             log.log(Level.SEVERE, "error during handle", exc);
+            res.sendError(500, "Exception " + exc.getMessage());
         }
     }
 }

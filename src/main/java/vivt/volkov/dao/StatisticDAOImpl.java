@@ -25,7 +25,11 @@ public class StatisticDAOImpl implements StatisticDAO {
     public void updateStatistic(StatisticRecord rec) {
         try (Session session = HibernateSessionFactoryUtil.getFactory().openSession()) {
             Transaction tr = session.beginTransaction();
-            session.saveOrUpdate(rec);
+
+            if (rec.getId() == null)
+                session.save(rec);
+            else
+                session.update(rec);
             tr.commit();
 
             log.fine("statistic updated: " + rec);

@@ -9,7 +9,7 @@ import java.time.ZoneOffset;
 public class JournalRecord {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -44,6 +44,10 @@ public class JournalRecord {
 
     public ActionType getAction() {
         return action;
+    }
+
+    public void setAction(ActionType action) {
+        this.action = action;
     }
 
     public void setActionType(ActionTypes type) {

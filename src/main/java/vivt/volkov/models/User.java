@@ -4,11 +4,11 @@ import javax.persistence.*;
 
 
 @Entity
-@Table(name="user")
+@Table(name="users")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     private String login;
     private String password;
@@ -28,7 +28,7 @@ public class User {
         this.patronymic = patronymic;
     }
 
-    public int getId() { return id; }
+    public long getId() { return id; }
     public String getLogin() { return login; }
     public String getPassword() { return password; }
     public String getName() { return name; }
